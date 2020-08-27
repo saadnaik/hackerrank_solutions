@@ -1,0 +1,153 @@
+/*
+This is a C++ implementation of the Queen's Attack problem.
+
+Logic :
+Initialise default locations queen can attack given its row and col
+to max  value assuming there are no obstacles.
+Then iterate through the obstacles given one by one.
+If any obstacle present in row,col or diagonal reduce the number of 
+default places queen can attack in that direction.
+
+The obstacles can either be present as follows :
+
+Case 1: Obstacle Present in Same row as Queen's row
+    In this case if row is already common between queen and obstacle,
+    check for the col of the obstacle if it is greater or lesser than
+    that of queen's col .In this way, we will update "toleft" variable 
+    if obstacle col in lesser than queens col or "toright" if greater.
+    
+Case 2: Obstacle Present in Same col as Queen's col
+    In this case if col is already common between queen and obstacle,
+    check for the row of the obstacle if it is greater or lesser than
+    that of queen's row .In this way, we will update "totop" variable 
+    if obstacle row in lesser than queens row or "tobottom" if greater.
+    
+Case 3: Obstacle Present in one of the diagonal
+    If obstacle is not present in row or col.It may be present in one 
+    the diagonal i.e topleft,topright,bottomleft,bottomright.
+    Firstly,to check if the element is present in the diagonal or not 
+    simply we check the following:
+    
+    (Queen's row - Obstacle's row) == (Queen's col - Obstacle's col)
+    
+    if the above is true then you must update topleft,topright,bottomleft
+    or bottomright variable as such:
+    eg->
+    
+    (1,1)(1,2)(1,3)(1,4)(1,5)
+    (2,1)(2,2)(2,3)(2,4)(2,5)
+    (3,1)(3,2)(3,3)(3,4)(3,5)
+    (4,1)(4,2)(4,3)(4,4)(4,5)
+    (5,1)(5,2)(5,3)(5,4)(5,5)
+    
+    Assume queen is present at (4,3) then
+    ( Qr=Queen's row | Qc=Queen's col | Or=Obstacle's row | Oc=Obstacle's col )
+    
+    topleft    : Qr - Or > 0 &&  Qc - Oc > 0  // (Or,Oc)=(3,2) then  4-3 >0 &&  3-2 >0
+    topright   : Qr - Or > 0 &&  Qc - Oc < 0  // (Or,Oc)=(2,5) then  4-2 >0 &&  3-5 <0
+    bottomleft : Qr - Or < 0 &&  Qc - Oc > 0  // (Or,Oc)=(5,2) then  4-5 <0 &&  3-2 >0
+    bottomright: Qr - Or < 0 &&  Qc - Oc < 0  // (Or,Oc)=(5,4) then  4-5 <0 &&  3-4 <0
+    
+    Finally total positions queen can attack will be sum of blocks in all directions.
+    
+Extra :
+I have tried to explain as much as I can and also have used understandable variable names.
+Hope it helps :)
+*/
+
+
+int queensAttack(int n, int k, int r_q, int c_q, vector<vector<int>> obstacles) {
+
+/*Few variable declarations*/
+int posQueenAttacks=0;
+int i=r_q;
+int j=c_q;
+int obstacles_row=0;
+int obstacles_col=0;
+int curVal=0;
+
+/*Default locations queen can attack given its position and size of board*/
+int  toleft       =c_q-1;
+int  toright      =n-c_q;
+int  totop        =r_q-1;
+int  tobottom     =n-r_q;
+int  totopLeft    =std::min(r_q-1,c_q-1);
+int  totopRight   =std::min(r_q-1,n-c_q);
+int  tobottomLeft =std::min(n-r_q,c_q-1);
+int  tobottomRight=std::min(n-r_q,n-c_q);
+
+
+for( int m = 0; m < obstacles.size(); ++m )
+{
+    for( int n = 0; n < obstacles[m].size()-1;++n)
+    {
+        obstacles_row=obstacles[m][n];
+        obstacles_col=obstacles[m][n+1];
+
+        if ( r_q == obstacles_row ) //row check
+        {
+            if ( c_q > obstacles_col ){
+                if ( (c_q-obstacles_col) < toleft ) 
+                {    
+                   toleft= c_q-obstacles_col-1; // minus 1 because we have to exclude queens own location
+                }
+            }
+            else{
+                if ( (obstacles_col -c_q) < toright )
+                {    toright = obstacles_col-c_q -1;}
+            }
+        }
+        if( c_q == obstacles_col ) //col check
+        {
+            if (r_q > obstacles_row){
+                if ( (r_q - obstacles_row) < totop )
+                { totop=r_q - obstacles_row -1;}
+            }
+            else{
+                if ( (obstacles_row - r_q) < tobottom )
+                { tobottom=obstacles_row - r_q -1;}
+            }    
+        }
+        if ( abs(r_q - obstacles_row)  == abs(c_q - obstacles_col) ) //diagonal check
+        {
+            if ( r_q - obstacles_row > 0 &&  c_q - obstacles_col > 0)
+            {
+                curVal=r_q-obstacles_row -1;
+                if ( curVal < totopLeft )
+                {
+                    totopLeft=curVal;
+                }
+
+            }
+            else if( r_q - obstacles_row > 0 && c_q - obstacles_col < 0 )
+            {
+                    curVal=r_q-obstacles_row -1;
+                    if ( curVal < totopRight )
+                    {
+                        totopRight=curVal;
+                    }
+            }
+            else if( r_q - obstacles_row < 0 && c_q - obstacles_col > 0 )
+            {
+                curVal=c_q - obstacles_col -1;
+                if ( curVal < tobottomLeft ){
+                        tobottomLeft=curVal;
+                }
+            }
+            else if( r_q - obstacles_row < 0 && c_q - obstacles_col < 0 )
+            {
+                    curVal=obstacles_row-r_q -1;
+                    if ( curVal < tobottomRight ){
+                        tobottomRight=curVal;
+                    }
+            }
+            curVal=0; // making this temperoary variable currentVal as 0 for next obstacle.
+        }    
+    }  
+}
+
+/*Add all positions queen can travel*/
+posQueenAttacks=toleft+toright+totop+tobottom+totopLeft+totopRight+tobottomLeft+tobottomRight;
+
+return posQueenAttacks;
+}
