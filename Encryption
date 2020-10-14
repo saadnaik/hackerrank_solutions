@@ -1,0 +1,87 @@
+/*
+Algorithm Used :
+
+1. Removed the spaces in the string.
+2. Computed the rows and cols as per requirement.
+3. If prod of the row and cols seemed to be lesser than the lenght of the string (this means your string wont basically fit ).
+   So Increase row and compute prod again.
+4. After acquiring correct row and col in step 3.Simply loop through the cols and populate the encrypted array.
+
+eg : Pope John is learning
+length without spaces = 18 , rows=4 ,cols=5
+
+i\j 0  1  2  3  4  
+0   P  o  p  e  J
+1   o  h  n  i  s
+2   l  e  a  r  n
+3   i  n  g
+
+Encrypted string : Poli ohen pnag eir Jsn
+
+Note: This code does not uses and 2D array for its solution.
+*/
+
+
+#include <bits/stdc++.h>
+
+using namespace std;
+
+// Complete the encryption function below.
+string encryption(string s) {
+int orglen=s.length(),row=0,col=0,prod=0,found=0,newlen=0,aptrow=0,diff=0,next=0;
+string withoutSpaces="",encryptedString="";
+
+//Getting new string without spaces
+for ( int i=0;i<orglen;i++){
+    if ( s.at(i) != ' ' ){
+        withoutSpaces=withoutSpaces+s.at(i);
+    }
+}
+
+//computing rows and cols
+newlen=withoutSpaces.length();
+row=floor(sqrt(newlen));
+col=ceil(sqrt(newlen));
+prod=row*col;
+
+//getting appropriate row if not proper
+if ( prod < newlen ){
+    while ( prod < newlen ){
+        row++;
+        prod=row*col;
+    }
+}
+
+//populating and printing encrypted string
+string encrypted[col];
+for( int i=0;i<col;i++){
+    encrypted[i]=encrypted[i]+withoutSpaces.at(i);
+    next=i+col;
+    for( int j=0;j<row-1;j++){
+       if ( next < newlen ){
+           encrypted[i]=encrypted[i]+withoutSpaces.at(next);
+           next=next+col;
+       }
+    }
+    encryptedString=encryptedString+encrypted[i]+" ";
+}
+
+
+return encryptedString;
+}
+
+int main()
+{
+    ofstream fout(getenv("OUTPUT_PATH"));
+
+    string s;
+    getline(cin, s);
+
+    string result = encryption(s);
+
+    fout << result << "\n";
+
+    fout.close();
+
+    return 0;
+}
