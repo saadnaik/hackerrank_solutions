@@ -1,0 +1,150 @@
+/*
+Luckily the BomberMan Follows a pattern as follows :
+1. At initial sec 0 and 1st sec 1 we return the grid as it is .
+2. At even seconds all the positions are filled with bombs .So we return grid filled with'O'.
+3. The 3rd condition is where the actual logic lies . Which is 
+    For all odd odd numbers run the loop which transforms the grid to one sec ahead in time using logic mentioned in problem and
+    for all even odd numbers run the loop once.
+    
+    I KNOW IT'S CONFUSING ! HOLD ON....
+    
+    eg : odd numbers => 1,3,5,7,9....
+         odd num pos => 1,2,3,4,5...
+         run loop    => 1,2,1,2,1...
+
+    with the above pattern the logic is pretty clear now .
+    
+ABOUT THE LOOP THAT CHANGES THE GRID BY PLUS ONE SEC:
+
+I have just followed the logic given in probloem i.e (i+1)(i-1) && (j+1)(j-1) equal to '.'.
+Also I have actual grid in grid vector and a copy of it in gridCopy vector. I make changes in gridCopy refering to original grid.
+*/
+
+
+
+// Complete the bomberMan function below.
+vector<string> bomberMan(int n, vector<string> grid) {
+    
+    int row=grid.size();
+    int col=grid[0].size();
+    int colCount=0,num=0,runloop=0;
+    std::string temp(col,'O');
+    std::vector<string> gridCopy;
+    gridCopy = grid ;
+   
+    if( n == 0 || n == 1 ){
+        return grid ;
+    }
+    else if( n % 2 == 0 )
+    {
+            gridCopy.clear();
+            for( int i=0;i<row;i++){
+                gridCopy.push_back(temp);
+            }
+    }
+    else
+    {   
+        num = ( n - 1)/2; // this is just a variation of the eq of odd numbers i.e 2n+1=oddnum
+        if( num%2 == 0 ){
+            runloop=2;
+        }
+        else{
+            runloop=1;
+        }
+        
+        while( runloop !=0 ){
+            grid=gridCopy;
+            for( int i=0;i<row;i++){
+                    while( colCount <= col-1 ){
+                        if( grid[i].at(colCount) == 'O'){ //I have used 'X' instead of '.' so as to avoid overwriting .check else  condition
+                            
+                            if ( i == 0 ){
+                                if( colCount == 0 ){
+                                   gridCopy[i].at(colCount) = '.';
+                                   if( col != 1){ // These conditions take care of problems having 1 col
+                                        gridCopy[i].at(colCount+1) = 'X';   
+                                   }
+                                   if( row != 1){ // These conditions take care of problems having 1 row
+                                        gridCopy[i+1].at(colCount) = 'X';   
+                                   }
+                                }
+                                else if( colCount == col-1 ){
+                                    gridCopy[i].at(colCount) = '.';
+                                    gridCopy[i].at(colCount-1) = '.';
+                                    if( row != 1){
+                                        gridCopy[i+1].at(colCount) = 'X';   
+                                    }
+                                }
+                                else{
+                                    gridCopy[i].at(colCount) = '.';
+                                    gridCopy[i].at(colCount+1) = 'X';
+                                    gridCopy[i].at(colCount-1) = '.';
+                                    if( row != 1){
+                                        gridCopy[i+1].at(colCount) = 'X';   
+                                    }
+                                }
+                            }
+                            else if( i == row-1){
+                                if( colCount == 0 ){
+                                    gridCopy[i].at(colCount) = '.';
+                                    gridCopy[i-1].at(colCount) = '.';
+                                    if( col != 1){
+                                        gridCopy[i].at(colCount+1) = 'X';   
+                                    }
+                                }
+                                else if( colCount == col-1 ){
+                                    gridCopy[i].at(colCount) = '.';
+                                    gridCopy[i].at(colCount-1) = '.';
+                                    gridCopy[i-1].at(colCount) = '.';
+                                }
+                                else{
+                                    gridCopy[i].at(colCount) = '.';
+                                    gridCopy[i].at(colCount+1) = 'X';
+                                    gridCopy[i].at(colCount-1) = '.';
+                                    gridCopy[i-1].at(colCount) = '.';
+                                }
+                            }
+                            else{
+                                if( colCount == 0 ){
+                                    gridCopy[i].at(colCount) = '.';
+                                    gridCopy[i+1].at(colCount) = 'X';
+                                    gridCopy[i-1].at(colCount) = '.';
+                                    if( col != 1){
+                                        gridCopy[i].at(colCount+1) = 'X';    
+                                    }  
+                                }
+                                else if( colCount == col-1 ){
+                                    gridCopy[i].at(colCount) = '.';
+                                    gridCopy[i+1].at(colCount) = 'X';
+                                    gridCopy[i-1].at(colCount) = '.';
+                                    gridCopy[i].at(colCount-1) = '.';
+                                }
+                                else{
+                                    gridCopy[i].at(colCount) = '.';
+                                    gridCopy[i].at(colCount+1) = 'X';
+                                    gridCopy[i].at(colCount-1) = '.';
+                                    gridCopy[i+1].at(colCount) = 'X';
+                                    gridCopy[i-1].at(colCount) = '.';
+                                }
+                            }
+                        }
+                        else{
+                            if( gridCopy[i].at(colCount) == 'X' ){
+                                gridCopy[i].at(colCount)='.';
+                            }
+                            else{
+                                gridCopy[i].at(colCount)='O';
+                            }
+                            
+                        }
+                        colCount++;
+                        
+                    }
+                    colCount=0;
+            } 
+            runloop--;
+        }
+    }
+
+    return gridCopy;
+}
